@@ -107,13 +107,17 @@ def run_client(config: ClientConfig) -> int:
     test_action.triggered.connect(_notify_test)
     menu.addAction(test_action)
 
-    speak_action = QAction("Test TTS (stub)")
+    speak_action = QAction(f"Test TTS ({config.tts_backend})")
     def _tts_test() -> None:
         from mclaude_hub.audio import audio_registry
-        import mclaude_hub.audio.stubs  # ensure stub is registered
-        tts = audio_registry.get_tts(config.tts_backend)
+        _ensure_audio_backends(config)
+        backend_name = config.tts_backend
+        if backend_name not in audio_registry.tts_names():
+            _send_notification("TTS error", f"Backend {backend_name!r} not available, using stub")
+            backend_name = "stub"
+        tts = audio_registry.get_tts(backend_name)
         tts.speak("This is a test. Voice output is working.")
-        _send_notification("TTS test", "Spoke: This is a test.")
+        _send_notification("TTS test", f"Spoke via {backend_name}: This is a test.")
     speak_action.triggered.connect(_tts_test)
     menu.addAction(speak_action)
 
@@ -133,6 +137,28 @@ def run_client(config: ClientConfig) -> int:
         )
 
     return app.exec()
+
+
+def _ensure_audio_backends(config: ClientConfig) -> None:
+    """Import audio backend modules based on config so they register themselves.
+
+    Always imports stubs as a fallback. Then tries to import the real backend
+    module matching the config. If import fails (missing dependency), the stub
+    remains available.
+    """
+    import mclaude_hub.audio.stubs  # noqa: F401 - always available
+
+    if config.stt_backend == "faster-whisper":
+        try:
+            import mclaude_hub.audio.stt_faster_whisper  # noqa: F401
+        except ImportError:
+            pass
+
+    if config.tts_backend == "pyttsx3":
+        try:
+            import mclaude_hub.audio.tts_pyttsx3  # noqa: F401
+        except ImportError:
+            pass
 
 
 def _send_notification(title: str, message: str) -> None:

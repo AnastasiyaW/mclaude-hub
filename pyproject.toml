@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mclaude-hub"
-version = "0.1.0"
+version = "0.2.0"
 description = "Network + desktop + audio layer for mclaude: hub server, tray client, STT/TTS, Claude bridge"
 readme = "README.md"
 license = { text = "MIT" }

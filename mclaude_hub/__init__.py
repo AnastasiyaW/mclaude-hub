@@ -14,4 +14,4 @@ The hub is additive. If the server is down, everything degrades to local file mo
 surface later. Nothing hard-fails because a piece is missing.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
