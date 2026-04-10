@@ -42,6 +42,13 @@ htmlcov/
 hub.toml
 .mclaude-hub.toml
 
+# Inbox staging area (may contain private data before sorting)
+_inbox/findings/
+_inbox/research/
+_inbox/code-snippets/
+!_inbox/README.md
+!_inbox/**/.gitkeep
+
 # Claude Code session state for THIS repo's development
 .claude/locks/active-work/
 .claude/locks/completed/
